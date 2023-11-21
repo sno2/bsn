@@ -13,7 +13,7 @@
     />
   </head>
   <body class="h-screen flex flex-col">
-    <header class="grid grid-cols-3 items-center px-6 border-b border-zinc-700">
+    <header class="grid grid-cols-3 items-center px-4 border-b border-zinc-700">
       <img src="/logo.jpg" width="80" />
       <h1
         class="text-slate-400 italic mx-auto text [&>a]:transition [&>a:hover]:text-white [&>a:hover]:text-slate-200"
@@ -43,11 +43,30 @@
       </div>
     </header>
     <main class="w-full h-full">
-      <div class="grid grid-cols-2 w-full h-[100%]">
-        <div id="container"></div>
+      <div
+        class="grid w-full h-[100%]"
+        style="grid-template-columns: repeat(21, 1fr)"
+      >
+        <aside
+          class="col-span-1 flex flex-col items-center border-r border-slate-600 bold"
+        >
+          <button
+            class="px-3 py-4 w-full bg-[rgba(255,255,255,.05)] hover:bg-teal-600 transition"
+            id="bs-btn"
+          >
+            BSX
+          </button>
+          <button
+            class="px-3 py-4 w-full bg-[rgba(255,255,255,.05)] hover:bg-teal-600 transition hidden"
+            id="bsx-btn"
+          >
+            BS
+          </button>
+        </aside>
+        <div id="container" class="col-span-10"></div>
         <div
           id="terminal"
-          class="overflow-y-auto font-mono h-full bg-black px-4 py-4"
+          class="col-span-10 overflow-y-auto font-mono h-full bg-black px-4 py-4 overflow-hidden"
         ></div>
       </div>
     </main>

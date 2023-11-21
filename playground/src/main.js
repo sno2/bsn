@@ -41,10 +41,66 @@ const moduleBytes = fetch("/bussin.wasm");
 // TODO: We probably should await this.
 init();
 
+const wasmUtils = WebAssembly.instantiateStreaming(fetch("/wasm_utils.wasm"));
 const module = WebAssembly.compileStreaming(moduleBytes);
 
-const $output = document.getElementById("output");
 const $runBtn = document.getElementById("run-btn");
+const $bsBtn = document.getElementById("bs-btn");
+const $bsxBtn = document.getElementById("bsx-btn");
+
+const encoder = new TextEncoder();
+const decoder = new TextDecoder();
+
+async function runTranslation(targetBs) {
+  const lib = (await wasmUtils).instance;
+  const memory = lib.exports.memory;
+
+  const sourceText = editor.getValue();
+
+  const sourcePtr = lib.exports.alloc(sourceText.length);
+
+  encoder.encodeInto(
+    sourceText,
+    new Uint8Array(memory.buffer, sourcePtr, sourceText.length)
+  );
+
+  const status = lib.exports.translate(targetBs, sourcePtr, sourceText.length);
+
+  if (status >= 0) {
+    const translatedLength = status;
+
+    const translatedPtr = lib.exports.getTranslatedPointer();
+
+    const translatedBuffer = new Uint8Array(
+      memory.buffer,
+      translatedPtr,
+      translatedLength
+    );
+
+    const translated = decoder.decode(translatedBuffer);
+
+    editor.setValue(translated);
+
+    lib.exports.free(translatedPtr, translatedLength);
+  } else {
+    console.error("Failed to translate code with error:", status);
+  }
+
+  lib.exports.free(sourcePtr, sourceText.length);
+
+  if (targetBs) {
+    $bsBtn.classList.add("hidden");
+    $bsxBtn.classList.remove("hidden");
+    editor.updateOptions({ language: "bs" });
+  } else {
+    $bsBtn.classList.remove("hidden");
+    $bsxBtn.classList.add("hidden");
+    editor.updateOptions({ language: "bsx" });
+  }
+}
+
+$bsBtn.addEventListener("click", () => runTranslation(true));
+$bsxBtn.addEventListener("click", () => runTranslation(false));
 
 $runBtn.addEventListener("click", async () => {
   // Instantiate the WASI module

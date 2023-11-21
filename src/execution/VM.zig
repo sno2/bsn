@@ -226,12 +226,17 @@ pub fn init(initial_heap: Heap, config: Config) !VM {
 
     try environment.put(
         heap.sparse,
-        switch (config.syntax) {
-            .bs => "println",
-            .bsx => "waffle",
-        },
+        "println",
         .{ .value = .{ .builtin_function = try heap.builtin_functions.create(&heap, &println) } },
     );
+
+    if (config.syntax == .bsx) {
+        try environment.put(
+            heap.sparse,
+            "waffle",
+            .{ .value = .{ .builtin_function = try heap.builtin_functions.create(&heap, &println) } },
+        );
+    }
 
     try environment.put(
         heap.sparse,

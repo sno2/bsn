@@ -68,17 +68,22 @@ pub fn build(b: *std.Build) void {
     const test_step = b.step("test", "Run unit tests");
     test_step.dependOn(&run_unit_tests.step);
 
-    var wasm_step = b.step("wasm", "Build the wasm module");
+    var playground_step = b.step("playground", "Build the wasm module");
 
-    const wasm_exe = b.addExecutable(.{
-        .name = "bussin",
-        .root_source_file = .{ .path = "src/wasm.zig" },
-        .target = target,
+    var wasm_exe = b.addExecutable(.{
+        .name = "wasm_utils",
+        .root_source_file = .{ .path = "src/wasm_utils.zig" },
+        .target = .{
+            .cpu_arch = .wasm32,
+            .os_tag = .freestanding,
+        },
         .optimize = optimize,
     });
+    wasm_exe.entry = .disabled;
+    wasm_exe.rdynamic = true;
+    var wasm_artifact = b.addInstallArtifact(wasm_exe, .{
+        .dest_dir = .{ .override = .{ .custom = "../playground/public" } },
+    });
 
-    // b.installArtifact(wasm_exe);
-
-    wasm_exe.step.dependOn(b.getInstallStep());
-    wasm_step.dependOn(&wasm_exe.step);
+    playground_step.dependOn(&wasm_artifact.step);
 }

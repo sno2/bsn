@@ -2,12 +2,32 @@
 
 const std = @import("std");
 
+const Config = @import("Config.zig");
 const execution = @import("../execution.zig");
 const Lexer = @import("Lexer.zig");
 
 const Executable = execution.Executable;
 const Token = Lexer.Token;
 const Value = execution.Value;
+
+pub const EmitContext = struct {
+    config: Config,
+    level: usize = 0,
+
+    pub fn indent(ctx: EmitContext) EmitContext {
+        return .{
+            .config = ctx.config,
+            .level = ctx.level + 1,
+        };
+    }
+
+    pub fn writeIndent(ctx: EmitContext, writer: anytype) !void {
+        for (0..ctx.level) |i| {
+            _ = i;
+            try writer.writeAll("    ");
+        }
+    }
+};
 
 /// An expression.
 pub const Expression = union(enum) {
@@ -21,6 +41,44 @@ pub const Expression = union(enum) {
     function_call: FunctionCall,
     member: *MemberExpression,
     object: ObjectExpression,
+
+    const BSIdentifierLookup = std.ComptimeStringMap([]const u8, .{
+        .{ "waffle", "println" },
+    });
+
+    const BSXIdentifierLookup = std.ComptimeStringMap([]const u8, .{
+        .{ "println", "waffle" },
+    });
+
+    pub fn emit(expression: Expression, ctx: EmitContext, writer: anytype) @TypeOf(writer).Error!void {
+        switch (expression) {
+            .null => try writer.writeAll(switch (ctx.config.syntax) {
+                .bs => "null",
+                .bsx => "fake",
+            }),
+            .identifier => |name| try writer.writeAll(switch (ctx.config.syntax) {
+                .bs => BSIdentifierLookup.get(name) orelse name,
+                .bsx => BSXIdentifierLookup.get(name) orelse name,
+            }),
+            .number_i32 => |number| try writer.print("{}", .{number}),
+            .number_f64 => |number| try writer.print("{d}", .{number}),
+            .string => |string| try writer.print("\"{s}\"", .{string}),
+            .boolean => |boolean| try writer.print("{s}", .{switch (boolean) {
+                true => switch (ctx.config.syntax) {
+                    .bs => "true",
+                    .bsx => "nocap",
+                },
+                false => switch (ctx.config.syntax) {
+                    .bs => "false",
+                    .bsx => "cap",
+                },
+            }}),
+            .binary => |binary| try binary.emit(ctx, writer),
+            .function_call => |function_call| try function_call.emit(ctx, writer),
+            .member => |member| try member.emit(ctx, writer),
+            .object => |object| try object.emit(ctx, writer),
+        }
+    }
 
     pub fn generateBytecode(expression: Expression, exe: *Executable) std.mem.Allocator.Error!void {
         switch (expression) {
@@ -64,6 +122,21 @@ pub const FunctionCall = struct {
         return self.data[1..];
     }
 
+    pub fn emit(function_call: FunctionCall, ctx: EmitContext, writer: anytype) !void {
+        try function_call.callee().emit(ctx, writer);
+        try writer.writeAll("(");
+
+        for (function_call.arguments(), 0..) |argument, i| {
+            if (i != 0) {
+                try writer.writeAll(", ");
+            }
+
+            try argument.emit(ctx, writer);
+        }
+
+        try writer.writeAll(")");
+    }
+
     pub fn generateBytecode(function_call: FunctionCall, exe: *Executable) !void {
         try function_call.callee().generateBytecode(exe);
 
@@ -79,6 +152,11 @@ pub const FunctionCall = struct {
 pub const MemberExpression = struct {
     root: Expression,
     name: []const u8,
+
+    pub fn emit(member: MemberExpression, ctx: EmitContext, writer: anytype) !void {
+        try member.root.emit(ctx, writer);
+        try writer.print(".{s}", .{member.name});
+    }
 
     pub fn generateBytecode(member: MemberExpression, exe: *Executable) !void {
         try member.root.generateBytecode(exe);
@@ -123,6 +201,46 @@ pub const BinaryOperator = enum {
             else => unreachable,
         };
     }
+
+    pub fn emit(operator: BinaryOperator, ctx: EmitContext, writer: anytype) !void {
+        try writer.writeAll(switch (operator) {
+            .@"+" => "+",
+            .@"-" => "-",
+            .@"*" => "*",
+            .@"/" => "/",
+            .@"%" => "%",
+            .@"<" => switch (ctx.config.syntax) {
+                .bs => "<",
+                .bsx => "smol",
+            },
+            .@">" => switch (ctx.config.syntax) {
+                .bs => ">",
+                .bsx => "thicc",
+            },
+            .@"<=" => "<=",
+            .@">=" => ">=",
+            .@"==" => switch (ctx.config.syntax) {
+                .bs => "==",
+                .bsx => "nah",
+            },
+            .@"!=" => switch (ctx.config.syntax) {
+                .bs => "!=",
+                .bsx => "nah",
+            },
+            .@"&&" => switch (ctx.config.syntax) {
+                .bs => "&&",
+                .bsx => "btw",
+            },
+            .@"|" => switch (ctx.config.syntax) {
+                .bs => "|",
+                .bsx => "carenot",
+            },
+            .@"=" => switch (ctx.config.syntax) {
+                .bs => "=",
+                .bsx => "be",
+            },
+        });
+    }
 };
 
 /// A binary expression.
@@ -130,6 +248,14 @@ pub const BinaryExpression = struct {
     left: Expression,
     operator: BinaryOperator,
     right: Expression,
+
+    pub fn emit(binary: BinaryExpression, ctx: EmitContext, writer: anytype) !void {
+        try binary.left.emit(ctx, writer);
+        try writer.writeAll(" ");
+        try binary.operator.emit(ctx, writer);
+        try writer.writeAll(" ");
+        try binary.right.emit(ctx, writer);
+    }
 
     pub fn generateBytecode(binary: BinaryExpression, exe: *Executable) !void {
         // Assignment
@@ -179,6 +305,21 @@ pub const ObjectExpression = struct {
         value: Expression,
     };
 
+    pub fn emit(object: ObjectExpression, ctx: EmitContext, writer: anytype) !void {
+        try writer.writeAll("{ ");
+
+        for (object.entries, 0..) |entry, i| {
+            if (i != 0) {
+                try writer.writeAll(", ");
+            }
+
+            try writer.print("{s}: ", .{entry.name});
+            try entry.value.emit(ctx, writer);
+        }
+
+        try writer.writeAll(" }");
+    }
+
     pub fn generateBytecode(object: ObjectExpression, exe: *Executable) !void {
         try exe.emitWithIndex(.create_object, @intCast(object.entries.len));
         for (object.entries) |entry| {
@@ -197,6 +338,20 @@ pub const Statement = union(enum) {
     @"for": *ForStatement,
     @"fn": *FnStatement,
     expression: Expression,
+
+    pub fn emit(statement: Statement, ctx: EmitContext, writer: anytype) @TypeOf(writer).Error!void {
+        try ctx.writeIndent(writer);
+        switch (statement) {
+            .let => |let| try let.emit(ctx, writer),
+            .@"const" => |@"const"| try @"const".emit(ctx, writer),
+            .@"if" => |@"if"| try @"if".emit(ctx, writer),
+            .try_catch => |try_catch| try try_catch.emit(ctx, writer),
+            .@"for" => |@"for"| try @"for".emit(ctx, writer),
+            .@"fn" => |@"fn"| try @"fn".emit(ctx, writer),
+            .expression => |expression| try expression.emit(ctx, writer),
+        }
+        try writer.writeAll("\n");
+    }
 
     pub fn generateBytecode(statement: Statement, exe: *Executable) std.mem.Allocator.Error!void {
         switch (statement) {
@@ -219,6 +374,27 @@ pub const LetStatement = struct {
     name: []const u8,
     expression: Expression,
 
+    pub fn emit(let: LetStatement, ctx: EmitContext, writer: anytype) !void {
+        try writer.print("{s} {s} {s} ", .{
+            switch (ctx.config.syntax) {
+                .bs => "let",
+                .bsx => "lit",
+            },
+            let.name,
+            switch (ctx.config.syntax) {
+                .bs => "=",
+                .bsx => "be",
+            },
+        });
+
+        try let.expression.emit(ctx, writer);
+
+        try writer.writeAll(switch (ctx.config.syntax) {
+            .bs => ";",
+            .bsx => " rn",
+        });
+    }
+
     pub fn generateBytecode(let: LetStatement, exe: *Executable) !void {
         try let.expression.generateBytecode(exe);
         try exe.emitWithIdentifier(.create_mutable_binding, let.name);
@@ -229,6 +405,27 @@ pub const LetStatement = struct {
 pub const ConstStatement = struct {
     name: []const u8,
     expression: Expression,
+
+    pub fn emit(@"const": ConstStatement, ctx: EmitContext, writer: anytype) !void {
+        try writer.print("{s} {s} {s} ", .{
+            switch (ctx.config.syntax) {
+                .bs => "const",
+                .bsx => "mf",
+            },
+            @"const".name,
+            switch (ctx.config.syntax) {
+                .bs => "=",
+                .bsx => "be",
+            },
+        });
+
+        try @"const".expression.emit(ctx, writer);
+
+        try writer.writeAll(switch (ctx.config.syntax) {
+            .bs => ";",
+            .bsx => " rn",
+        });
+    }
 
     pub fn generateBytecode(@"const": ConstStatement, exe: *Executable) !void {
         try @"const".expression.generateBytecode(exe);
@@ -246,6 +443,49 @@ pub const IfStatement = struct {
         condition: ?Expression,
         block: []Statement,
     };
+
+    pub fn emit(@"if": IfStatement, ctx: EmitContext, writer: anytype) !void {
+        try writer.print("{s} (", .{switch (ctx.config.syntax) {
+            .bs => "if",
+            .bsx => "sus",
+        }});
+
+        try @"if".condition.emit(ctx, writer);
+
+        try writer.writeAll(") {\n");
+
+        for (@"if".block) |stmt| {
+            try stmt.emit(ctx.indent(), writer);
+        }
+
+        try ctx.writeIndent(writer);
+        try writer.writeAll("}\n");
+
+        for (@"if".alternates) |alternate| {
+            if (alternate.condition) |condition| {
+                try writer.print("{s} (", .{switch (ctx.config.syntax) {
+                    .bs => "else if",
+                    .bsx => "impostor sus",
+                }});
+
+                try condition.emit(ctx, writer);
+
+                try writer.writeAll(") {\n");
+            } else {
+                try writer.writeAll(switch (ctx.config.syntax) {
+                    .bs => "else {\n",
+                    .bsx => "impostor {\n",
+                });
+            }
+
+            for (alternate.block) |stmt| {
+                try stmt.emit(ctx.indent(), writer);
+            }
+
+            try ctx.writeIndent(writer);
+            try writer.writeAll("}");
+        }
+    }
 
     pub fn generateBytecode(@"if": IfStatement, exe: *Executable) !void {
         var merge_jump_indexes = try std.ArrayList(u32).initCapacity(exe.allocator, 1 + @"if".alternates.len);
@@ -307,6 +547,35 @@ pub const ForStatement = struct {
     update: Expression,
     block: []Statement,
 
+    pub fn emit(@"for": ForStatement, ctx: EmitContext, writer: anytype) !void {
+        try writer.print("{s} (", .{switch (ctx.config.syntax) {
+            .bs => "for",
+            .bsx => "yall",
+        }});
+
+        switch (@"for".init) {
+            .let => |let| try let.emit(ctx, writer),
+            .@"const" => |@"const"| try @"const".emit(ctx, writer),
+            else => unreachable,
+        }
+        try writer.writeAll(" ");
+        try @"for".@"test".emit(ctx, writer);
+        try writer.writeAll(switch (ctx.config.syntax) {
+            .bs => "; ",
+            .bsx => " rn ",
+        });
+        try @"for".update.emit(ctx, writer);
+
+        try writer.writeAll(") {\n");
+
+        for (@"for".block) |stmt| {
+            try stmt.emit(ctx.indent(), writer);
+        }
+
+        try ctx.writeIndent(writer);
+        try writer.writeAll("}");
+    }
+
     pub fn generateBytecode(@"for": ForStatement, exe: *Executable) !void {
         try exe.emit(.push_environment);
         try @"for".init.generateBytecode(exe);
@@ -339,6 +608,30 @@ pub const TryCatchStatement = struct {
     @"try": []Statement,
     @"catch": []Statement,
 
+    pub fn emit(try_catch: TryCatchStatement, ctx: EmitContext, writer: anytype) !void {
+        try writer.print("}} {s} {{", .{switch (ctx.config.syntax) {
+            .bs => "try",
+            .bsx => "fuck_around",
+        }});
+
+        for (try_catch.@"try") |stmt| {
+            try stmt.emit(ctx.indent(), writer);
+        }
+
+        try ctx.writeIndent(writer);
+        try writer.print("}} {s} {{\n", .{switch (ctx.config.syntax) {
+            .bs => "catch",
+            .bsx => "find_out",
+        }});
+
+        for (try_catch.@"catch") |stmt| {
+            try stmt.emit(ctx.indent(), writer);
+        }
+
+        try ctx.writeIndent(writer);
+        try writer.writeAll("}");
+    }
+
     pub fn generateBytecode(try_catch: TryCatchStatement, exe: *Executable) !void {
         const exception_index = try exe.emitWithMutableIndex(.push_fallible);
 
@@ -365,6 +658,30 @@ pub const FnStatement = struct {
     name: []const u8,
     parameters: [][]const u8,
     block: []Statement,
+
+    pub fn emit(@"fn": FnStatement, ctx: EmitContext, writer: anytype) !void {
+        try writer.print("{s} {s}(", .{ switch (ctx.config.syntax) {
+            .bs => "fn",
+            .bsx => "bruh",
+        }, @"fn".name });
+
+        for (@"fn".parameters, 0..) |parameter, i| {
+            if (i != 0) {
+                try writer.writeAll(", ");
+            }
+
+            try writer.writeAll(parameter);
+        }
+
+        try writer.writeAll(") {\n");
+
+        for (@"fn".block) |stmt| {
+            try stmt.emit(ctx.indent(), writer);
+        }
+
+        try ctx.writeIndent(writer);
+        try writer.writeAll("}");
+    }
 
     pub fn generateBytecode(@"fn": *FnStatement, exe: *Executable) !void {
         // NOTE: Functions are compiled lazily so we just add the node.
