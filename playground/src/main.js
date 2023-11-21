@@ -131,7 +131,10 @@ $runBtn.addEventListener("click", async () => {
         // 'ENVVAR1': '1',
         // 'ENVVAR2': '2'
       },
-      args: ["--inline-bsx", code],
+      args: [
+        "--inline-bs" + (document.body.classList.contains("dark") ? "x" : ""),
+        code,
+      ],
     });
 
     wasi.instantiate(await module, {
