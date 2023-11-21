@@ -2,6 +2,7 @@
 
 const std = @import("std");
 
+const ansi = @import("ansi.zig");
 const Executable = @import("Executable.zig");
 const Heap = @import("Heap.zig");
 const language = @import("../language.zig");
@@ -24,6 +25,12 @@ rng: std.rand.DefaultPrng,
 /// The error context.
 error_context: ?[]u8 = null,
 
+/// The color mode.
+color_mode: enum {
+    no,
+    yes,
+} = .yes, // TODO: This should be determined somewhere else.
+
 pub const Error = std.mem.Allocator.Error || error{Exception};
 
 pub const Arguments = struct {
@@ -36,8 +43,8 @@ pub const Arguments = struct {
 
 fn writeInnerValue(vm: *VM, writer: anytype, value: Value) @TypeOf(writer).Error!void {
     switch (value) {
-        .readonly_string => |string_index| try writer.print("\"{s}\"", .{vm.heap.readonly_strings.get(string_index)}),
-        .string => |string_index| try writer.print("\"{s}\"", .{vm.heap.strings.get(string_index)}),
+        .readonly_string => |string_index| try writer.print(ansi.green("\"{s}\""), .{vm.heap.readonly_strings.get(string_index)}),
+        .string => |string_index| try writer.print(ansi.green("\"{s}\""), .{vm.heap.strings.get(string_index)}),
         else => try vm.writeValue(writer, value),
     }
 }
@@ -46,14 +53,14 @@ fn writeInnerValue(vm: *VM, writer: anytype, value: Value) @TypeOf(writer).Error
 fn writeValue(vm: *VM, writer: anytype, value: Value) !void {
     switch (value) {
         .null => try writer.writeAll(switch (vm.config.syntax) {
-            .bs => "null",
-            .bsx => "fake",
+            .bs => ansi.blue("null"),
+            .bsx => ansi.blue("fake"),
         }),
-        .boolean => |boolean| try writer.print("{}", .{boolean}),
-        .number_i32 => |number| try writer.print("{}", .{number}),
-        .number_f64 => |number_index| try writer.print("{d}", .{vm.heap.numbers.get(number_index)}),
-        .readonly_string => |string_index| try writer.writeAll(vm.heap.readonly_strings.get(string_index)),
-        .string => |string_index| try writer.writeAll(vm.heap.strings.get(string_index)),
+        .boolean => |boolean| try writer.print(ansi.blue("{}"), .{boolean}),
+        .number_i32 => |number| try writer.print(ansi.lightGreen("{}"), .{number}),
+        .number_f64 => |number_index| try writer.print(ansi.lightGreen("{d}"), .{vm.heap.numbers.get(number_index)}),
+        .readonly_string => |string_index| try writer.print("{s}", .{vm.heap.readonly_strings.get(string_index)}),
+        .string => |string_index| try writer.print("{s}", .{vm.heap.strings.get(string_index)}),
         .object => |object_index| {
             const object: Heap.ObjectHeap.Item = vm.heap.objects.get(object_index);
 
