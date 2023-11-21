@@ -102,22 +102,11 @@ fn strcon(vm: *VM, arguments: Arguments) Error!Value {
 
     var writer = result.writer();
 
-    // TODO: Figure out why this isn't working.
-    if (arguments.get(0) == .string) {
-        writer.writeAll(vm.heap.strings.get(arguments.get(0).string)) catch
-            try vm.throwException("Unable to print first value.", &.{});
-    } else {
-        vm.writeValue(writer, arguments.get(0)) catch
-            try vm.throwException("Unable to print first value.", &.{});
-    }
+    vm.writeValue(writer, arguments.get(0)) catch
+        try vm.throwException("Unable to print first value.", .{});
 
-    if (arguments.get(1) == .string) {
-        writer.writeAll(vm.heap.strings.get(arguments.get(1).string)) catch
-            try vm.throwException("Unable to print second value.", &.{});
-    } else {
-        vm.writeValue(writer, arguments.get(1)) catch
-            try vm.throwException("Unable to print second value.", &.{});
-    }
+    vm.writeValue(writer, arguments.get(1)) catch
+        try vm.throwException("Unable to print second value.", &.{});
 
     return .{ .string = try vm.heap.strings.create(&vm.heap, try result.toOwnedSlice()) };
 }
