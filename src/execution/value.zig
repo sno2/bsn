@@ -43,11 +43,11 @@ pub const Value = union(enum) {
 
     pub fn @"+"(vm: *VM, left: Value, right: Value) !Value {
         // OPTIMIZATION: Use integer addition if they are both integers.
-        // if (left == .number_i32 and right == .number_i32) {
-        //     if (std.math.add(i32, left.number_i32, right.number_i32) catch null) |integer| {
-        //         return Value.from(integer);
-        //     }
-        // }
+        if (left == .number_i32 and right == .number_i32) {
+            if (std.math.add(i32, left.number_i32, right.number_i32) catch null) |integer| {
+                return Value.from(integer);
+            }
+        }
 
         const left_real = left.toReal(vm) orelse
             try vm.throwException("Left-hand side is not a number: %.", .{left});
@@ -60,11 +60,11 @@ pub const Value = union(enum) {
 
     pub fn @"-"(vm: *VM, left: Value, right: Value) !Value {
         // OPTIMIZATION: Use integer subtraction if they are both integers.
-        // if (left == .number_i32 and right == .number_i32) {
-        //     if (std.math.sub(i32, left.number_i32, right.number_i32) catch null) |integer| {
-        //         return Value.from(integer);
-        //     }
-        // }
+        if (left == .number_i32 and right == .number_i32) {
+            if (std.math.sub(i32, left.number_i32, right.number_i32) catch null) |integer| {
+                return Value.from(integer);
+            }
+        }
 
         const left_real = left.toReal(vm) orelse
             try vm.throwException("Left-hand side is not a number: %.", .{left});
@@ -77,11 +77,11 @@ pub const Value = union(enum) {
 
     pub fn @"*"(vm: *VM, left: Value, right: Value) !Value {
         // OPTIMIZATION: Use integer multiplication if they are both integers.
-        // if (left == .number_i32 and right == .number_i32) {
-        //     if (std.math.mul(i32, left.number_i32, right.number_i32) catch null) |integer| {
-        //         return Value.from(integer);
-        //     }
-        // }
+        if (left == .number_i32 and right == .number_i32) {
+            if (std.math.mul(i32, left.number_i32, right.number_i32) catch null) |integer| {
+                return Value.from(integer);
+            }
+        }
 
         const left_real = left.toReal(vm) orelse
             try vm.throwException("Left-hand side is not a number: %.", .{left});
@@ -94,11 +94,11 @@ pub const Value = union(enum) {
 
     pub fn @"/"(vm: *VM, left: Value, right: Value) !Value {
         // OPTIMIZATION: Use integer division if they are both integers.
-        // if (left == .number_i32 and right == .number_i32) {
-        //     if (std.math.divExact(i32, left.number_i32, right.number_i32) catch null) |integer| {
-        //         return Value.from(integer);
-        //     }
-        // }
+        if (left == .number_i32 and right == .number_i32) {
+            if (std.math.divExact(i32, left.number_i32, right.number_i32) catch null) |integer| {
+                return Value.from(integer);
+            }
+        }
 
         const left_real = left.toReal(vm) orelse
             try vm.throwException("Left-hand side is not a number: %.", .{left});
@@ -114,11 +114,11 @@ pub const Value = union(enum) {
 
     pub fn @"%"(vm: *VM, left: Value, right: Value) !Value {
         // OPTIMIZATION: Use integer modulo if they are both integers.
-        // if (left == .number_i32 and right == .number_i32) {
-        //     if (std.math.rem(i32, left.number_i32, right.number_i32) catch null) |integer| {
-        //         return Value.from(integer);
-        //     }
-        // }
+        if (left == .number_i32 and right == .number_i32) {
+            if (std.math.rem(i32, left.number_i32, right.number_i32) catch null) |integer| {
+                return Value.from(integer);
+            }
+        }
 
         const left_real = left.toReal(vm) orelse
             try vm.throwException("Left-hand side is not a number: %.", .{left});
