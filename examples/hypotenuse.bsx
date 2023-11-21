@@ -1,0 +1,13 @@
+"Calculates the hypotenuse of the triangle"
+bruh quadraticFormula(a, b) {
+    nerd.sqrt(a * a + b * b)
+}
+
+"3 4 5 triangle"
+waffle(quadraticFormula(3, 4))
+
+"9 12 15 triangle"
+waffle(quadraticFormula(9, 12))
+
+"1 2 ??? triangle"
+waffle(quadraticFormula(1, 2))

@@ -1,0 +1,4 @@
+"We can iterate from 0 to 100"
+yall (lit i be 0 rn i smol 100 rn i be i + 1) {
+    waffle("Currently at", i)
+}

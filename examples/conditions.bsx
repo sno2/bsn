@@ -1,0 +1,19 @@
+lit counter be 0 rn
+
+sus (counter thicc 0) {
+    waffle("Counter is greater than 0.")
+} impostor sus (counter smol 0) {
+    waffle("Counter is less than 0.")
+} impostor {
+    waffle("Counter is equal to 0.")
+}
+
+lit name be "John" rn
+
+sus (counter thicc 0 btw name nah "Lucy") {
+    waffle("Lucy's counter is greater than 0.")
+} impostor sus (counter <= 0 carenot name nah "Simon") {
+    waffle("The counter is less than or equal to 0 or Simon's.")
+} impostor {
+    waffle("We just don't have the math yet.")
+}

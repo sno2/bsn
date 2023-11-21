@@ -1,0 +1,13 @@
+"Calculates the hypotenuse of the triangle"
+fn quadraticFormula(a, b) {
+    math.sqrt(a * a + b * b)
+}
+
+"3 4 5 triangle"
+println(quadraticFormula(3, 4))
+
+"9 12 15 triangle"
+println(quadraticFormula(9, 12))
+
+"1 2 ??? triangle"
+println(quadraticFormula(1, 2))

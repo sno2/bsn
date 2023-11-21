@@ -1,0 +1,11 @@
+lit counter be 0 rn
+
+"Using try allows you to handle errors"
+fuck_around {
+    "Let's try to increment 'countr'"
+    counter be countr + 1
+    "              ^ missing 'e'"
+} find_out {
+    "We can now access the 'error' string"
+    waffle("Uh oh!", error)
+}

@@ -1,0 +1,4 @@
+"We can loop from 0 to 100"
+for (let i = 0; i < 100; i = i + 1) {
+    println("Currently at", i)
+}

@@ -1,0 +1,19 @@
+let counter = 0;
+
+if (counter > 0) {
+    println("Counter is greater than 0.")
+} else if (counter < 0) {
+    println("Counter is less than 0.")
+} else {
+    println("Counter is equal to 0.")
+}
+
+let name = "John";
+
+if (counter > 0 && name == "Lucy") {
+    println("Lucy's counter is greater than 0.")
+} else if (counter <= 0 | name == "Simon") {
+    println("The counter is less than or equal to 0 or Simon's.")
+} else {
+    println("We just don't have the math yet.")
+}

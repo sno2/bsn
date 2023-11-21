@@ -1,0 +1,77 @@
+println("Mandelbrot set visualiser originally written in Bussin X by SKM GEEK.")
+
+fn mandelbrot(real, imag) {
+    let limit = 100;
+    let zReal = real;
+    let zImag = imag;
+
+    let break = false;
+
+    let return = limit;
+
+    for (let i = 0; i < limit; i = i + 1) {
+        if (break == false) {
+            let rtwo = zReal * zReal;
+            let itwo = zImag * zImag;
+
+            if (rtwo + itwo > 4) {
+                break = true
+                return = i
+            } else {
+                zImag = 2 * zReal * zImag + imag
+                zReal = rtwo - itwo + real
+            }
+        }
+    }
+    return
+}
+
+let width = 150;
+let height = 50;
+
+let xstart = 0 - 9 / 4;
+let xfin = 1 / 4;
+let ystart = 0 - 1;
+let yfin = 1;
+
+let dx = yfin - xstart / width - 1;
+let dy = yfin - ystart / height - 1;
+
+let line = "${}";
+let x = 0;
+let y = 0;
+let value = 0;
+
+let borderH = "++${}";
+for (let i = 0; i < width; i = i + 1) {
+    borderH = format(borderH, "=${}")
+}
+borderH = format(borderH, "++")
+println(borderH)
+
+for (let i = 0; i < height; i = i + 1) {
+    line = "||${}"
+    for (let j = 0; j < width; j = j + 1) {
+        x = xstart + j * dx
+        y = ystart + i * dy
+
+        value = mandelbrot(x, y)
+
+        if (value == 100) {
+            line = format(line, " ${}")
+        } else if (value > 50) {
+            line = format(line, "-${}")
+        } else if (value > 25) {
+            line = format(line, "+${}")
+        } else if (value > 10) {
+            line = format(line, "o${}")
+        } else if (value > 5) {
+            line = format(line, "0${}")
+        } else {
+            line = format(line, "#${}")
+        }
+    }
+    line = format(line, "||")
+    println(line)
+}
+println(borderH)

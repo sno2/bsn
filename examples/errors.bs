@@ -1,0 +1,12 @@
+let counter = 0
+
+"Using try allows you to handle errors"
+try {
+    "Let's try to increment 'countr'"
+    counter = countr + 1
+    "              ^ missing 'e'"
+} catch {
+    "We can now access the 'error' string"
+    println("Uh oh!", error)
+}
+
