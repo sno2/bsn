@@ -1,4 +1,4 @@
-<img src="./playground/public/logo.jpg" width="150" alt="bsn">
+<img src="./playground/public/logo.png" width="150" alt="bsn">
 
 An implementation of @face-hh 's
 [Bussin esoteric language](https://github.com/face-hh/bussin) written in Zig
