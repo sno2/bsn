@@ -206,8 +206,6 @@ fn random(vm: *VM, _: Arguments) Error!Value {
 fn sqrt(vm: *VM, arguments: Arguments) Error!Value {
     return switch (arguments.get(0)) {
         .number_i32 => |value| {
-            // TODO: There is probably a faster way to get the square root if
-            // the result is an integer.
             return .{ .number_f64 = try vm.heap.numbers.create(
                 &vm.heap,
                 @sqrt(@as(f64, @floatFromInt(value))),
