@@ -615,7 +615,7 @@ pub const TryCatchStatement = struct {
     @"catch": []Statement,
 
     pub fn emit(try_catch: TryCatchStatement, ctx: EmitContext, writer: anytype) !void {
-        try writer.print("{s} {{", .{switch (ctx.config.syntax) {
+        try writer.print("{s} {{\n", .{switch (ctx.config.syntax) {
             .bs => "try",
             .bsx => "fuck_around",
         }});
