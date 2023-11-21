@@ -7,6 +7,7 @@ import { Terminal } from "xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import "xterm/css/xterm.css";
 import "./language.js";
+import * as ansi from "./ansi.js";
 
 monaco.editor.defineTheme("Sunburst", Sunburst);
 monaco.editor.defineTheme("Dawn", Dawn);
@@ -32,7 +33,7 @@ const fitAddon = new FitAddon();
 term.loadAddon(fitAddon);
 
 term.open(document.getElementById("terminal"));
-term.write("$ ");
+term.write(ansi.blue("$ "));
 
 fitAddon.fit();
 editor.onKeyDown((e) => {
@@ -121,7 +122,7 @@ $runBtn.addEventListener("click", async () => {
   // Instantiate the WASI module
   try {
     term.reset();
-    term.writeln("$ bsn run main.bs");
+    term.writeln(ansi.blue("$") + " bsn run main.bs");
 
     const code = editor.getValue();
 
@@ -151,6 +152,8 @@ $runBtn.addEventListener("click", async () => {
   }
 
   term.write(
-    `[exit status: 0, duration: ${(performance.now() - start).toFixed(2)}ms] `
+    ansi.gray(
+      `[exit status: 0, duration: ${(performance.now() - start).toFixed(2)}ms] `
+    )
   );
 });
