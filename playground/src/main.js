@@ -66,36 +66,42 @@ async function runTranslation(targetBs) {
 
   const sourceText = editor.getValue();
 
-  const sourcePtr = lib.exports.alloc(sourceText.length);
+  if (sourceText.length !== 0) {
+    const sourcePtr = lib.exports.alloc(sourceText.length);
 
-  encoder.encodeInto(
-    sourceText,
-    new Uint8Array(memory.buffer, sourcePtr, sourceText.length)
-  );
-
-  const status = lib.exports.translate(targetBs, sourcePtr, sourceText.length);
-
-  if (status >= 0) {
-    const translatedLength = status;
-
-    const translatedPtr = lib.exports.getTranslatedPointer();
-
-    const translatedBuffer = new Uint8Array(
-      memory.buffer,
-      translatedPtr,
-      translatedLength
+    encoder.encodeInto(
+      sourceText,
+      new Uint8Array(memory.buffer, sourcePtr, sourceText.length)
     );
 
-    const translated = decoder.decode(translatedBuffer);
+    const status = lib.exports.translate(
+      targetBs,
+      sourcePtr,
+      sourceText.length
+    );
 
-    editor.setValue(translated);
+    if (status >= 0) {
+      const translatedLength = status;
 
-    lib.exports.free(translatedPtr, translatedLength);
-  } else {
-    console.error("Failed to translate code with error:", status);
+      const translatedPtr = lib.exports.getTranslatedPointer();
+
+      const translatedBuffer = new Uint8Array(
+        memory.buffer,
+        translatedPtr,
+        translatedLength
+      );
+
+      const translated = decoder.decode(translatedBuffer);
+
+      editor.setValue(translated);
+
+      lib.exports.free(translatedPtr, translatedLength);
+    } else {
+      console.error("Failed to translate code with error:", status);
+    }
+
+    lib.exports.free(sourcePtr, sourceText.length);
   }
-
-  lib.exports.free(sourcePtr, sourceText.length);
 
   if (targetBs) {
     $bsBtn.classList.add("hidden");
