@@ -135,11 +135,6 @@ fn exec(vm: *VM, arguments: Arguments) Error!Value {
     return .{ .string = try vm.heap.strings.create(&vm.heap, result.stdout) };
 }
 
-fn garbageCollect(vm: *VM, _: Arguments) Error!Value {
-    vm.heap.maybeCollectGarbage();
-    return .null;
-}
-
 fn input(vm: *VM, arguments: Arguments) Error!Value {
     var stdout = std.io.getStdOut().writer();
 
@@ -246,21 +241,31 @@ pub fn init(initial_heap: Heap, config: Config) !VM {
 
     try environment.put(
         heap.sparse,
-        switch (config.syntax) {
-            .bs => "exec",
-            .bsx => "clapback",
-        },
+        "exec",
         .{ .value = .{ .builtin_function = try heap.builtin_functions.create(&heap, &exec) } },
     );
 
+    if (config.syntax == .bsx) {
+        try environment.put(
+            heap.sparse,
+            "clapback",
+            .{ .value = .{ .builtin_function = try heap.builtin_functions.create(&heap, &exec) } },
+        );
+    }
+
     try environment.put(
         heap.sparse,
-        switch (config.syntax) {
-            .bs => "input",
-            .bsx => "yap",
-        },
+        "input",
         .{ .value = .{ .builtin_function = try heap.builtin_functions.create(&heap, &input) } },
     );
+
+    if (config.syntax == .bsx) {
+        try environment.put(
+            heap.sparse,
+            "yap",
+            .{ .value = .{ .builtin_function = try heap.builtin_functions.create(&heap, &input) } },
+        );
+    }
 
     try environment.put(
         heap.sparse,
@@ -288,29 +293,24 @@ pub fn init(initial_heap: Heap, config: Config) !VM {
         .{ .builtin_function = try heap.builtin_functions.create(&heap, &sqrt) },
     );
 
-    try environment.put(heap.sparse, switch (config.syntax) {
-        .bs => "math",
-        .bsx => "nerd",
-    }, .{ .value = .{ .object = try heap.objects.create(&heap, math_object) } });
+    try environment.put(
+        heap.sparse,
+        "math",
+        .{ .value = .{ .object = try heap.objects.create(&heap, math_object) } },
+    );
+
+    if (config.syntax == .bsx) {
+        try environment.put(
+            heap.sparse,
+            "nerd",
+            .{ .value = .{ .object = try heap.objects.create(&heap, math_object) } },
+        );
+    }
 
     try environment.put(
         heap.sparse,
         "time",
         .{ .value = .{ .builtin_function = try heap.builtin_functions.create(&heap, &time) } },
-    );
-
-    var bsn_object = Heap.ObjectHeap.Item{};
-
-    try bsn_object.put(
-        heap.sparse,
-        "garbageCollect",
-        .{ .builtin_function = try heap.builtin_functions.create(&heap, &garbageCollect) },
-    );
-
-    try environment.put(
-        heap.sparse,
-        "bsn",
-        .{ .value = .{ .object = try heap.objects.create(&heap, bsn_object) } },
     );
 
     try heap.environment_stack.append(heap.arena, environment);
