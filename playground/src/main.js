@@ -114,9 +114,12 @@ $bsBtn.addEventListener("click", () => runTranslation(true));
 $bsxBtn.addEventListener("click", () => runTranslation(false));
 
 $runBtn.addEventListener("click", async () => {
+  let start;
+  let status = 1;
+
   // Instantiate the WASI module
   try {
-    term.clear();
+    term.reset();
     term.writeln("$ bsn run main.bs");
 
     const code = editor.getValue();
@@ -133,19 +136,20 @@ $runBtn.addEventListener("click", async () => {
       env: {},
     });
 
-    const start = performance.now();
+    start = performance.now();
 
     // Run the start function
-    wasi.start();
+    status = wasi.start();
 
     term.write(wasi.getStdoutString().replaceAll("\n", "\n\r"));
     term.writeln(wasi.getStderrString().replaceAll("\n", "\n\r"));
-    term.write(
-      `[exit status: 0, duration: ${(performance.now() - start).toFixed(2)}ms] `
-    );
 
     wasi.free();
   } catch (err) {
     console.error(err);
   }
+
+  term.write(
+    `[exit status: 0, duration: ${(performance.now() - start).toFixed(2)}ms] `
+  );
 });
