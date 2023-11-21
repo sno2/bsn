@@ -18,4 +18,27 @@ to play around with this interpreter.
   [self-hosted Zig compiler implements async again](https://github.com/ziglang/zig/issues/6025),
   I will use it to add streaming IO.
 - Printing circular objects causes stack overflows.
+  ```
+  lit a = {}
+  a.a = a
+
+  "Stack overflow"
+  println(a)
+  ```
+- Parsing errors can have incorrect formatting in some cases.
+- Functions do not support capturing locals, but globals do work.
+  ```
+  bruh foo() {
+      lit a = 24
+
+      bruh add() {
+          a
+      }
+
+      add
+  }
+
+  "This will fail because it does not know about 'a'"
+  foo()()
+  ```
 - All other TODOs in the code.
