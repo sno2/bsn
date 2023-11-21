@@ -9,7 +9,8 @@ import "./language.js";
 monaco.editor.defineTheme("Sunburst", Sunburst);
 
 const editor = monaco.editor.create(document.getElementById("container"), {
-  value: "yall (lit i be 0 rn i smol 10 rn i be i + 1) {\n  waffle(i)\n}\n",
+  value:
+    'yall (lit i be 0 rn i smol 10 rn i be i + 1) {\n  waffle("Currently at", i)\n}\n',
   language: "bsx",
   fontFamily: "consolas",
   fontSize: 17,
