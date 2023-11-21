@@ -2,7 +2,6 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>bsn | A Bussin implementation</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -44,7 +43,7 @@
         </button>
       </div>
     </header>
-    <main class="w-full h-full">
+    <main class="w-full h-full overflow-y-hidden">
       <div
         class="grid w-full h-[100%]"
         style="grid-template-columns: repeat(21, 1fr)"
@@ -68,7 +67,7 @@
         <div id="container" class="col-span-10"></div>
         <div
           id="terminal"
-          class="col-span-10 overflow-y-auto font-mono h-full bg-[#111] dark:bg-black px-4 py-4 overflow-hidden"
+          class="col-span-10 font-mono h-full bg-[#111] dark:bg-black overflow-hidden"
         ></div>
       </div>
     </main>

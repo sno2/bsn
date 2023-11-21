@@ -4,6 +4,7 @@ import * as monaco from "monaco-editor";
 import Sunburst from "monaco-themes/themes/Sunburst.json";
 import Dawn from "monaco-themes/themes/Dawn.json";
 import { Terminal } from "xterm";
+import { FitAddon } from "@xterm/addon-fit";
 import "xterm/css/xterm.css";
 import "./language.js";
 
@@ -26,9 +27,13 @@ const term = new Terminal({
     background: "#000",
   },
 });
+const fitAddon = new FitAddon();
+term.loadAddon(fitAddon);
+
 term.open(document.getElementById("terminal"));
 term.write("$ ");
 
+fitAddon.fit();
 editor.onKeyDown((e) => {
   if (e.keyCode === monaco.KeyCode.Enter && e.shiftKey) {
     e.preventDefault();

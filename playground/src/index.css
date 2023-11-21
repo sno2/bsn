@@ -17,3 +17,7 @@ body.dark {
   background-color: #120e25;
   color: #fff;
 }
+
+.terminal {
+  padding: 1rem;
+}
