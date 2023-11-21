@@ -131,7 +131,7 @@ const editor = monaco.editor.create(document.getElementById("container"), {
 });
 
 const term = new Terminal({
-  fontFamily: "Cascadia Code",
+  fontFamily: "consolas",
   fontSize: 17,
   theme: {
     background: "#000",
