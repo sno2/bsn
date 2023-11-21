@@ -36,6 +36,7 @@ pub const Arguments = struct {
 
 fn writeInnerValue(vm: *VM, writer: anytype, value: Value) @TypeOf(writer).Error!void {
     switch (value) {
+        .readonly_string => |string_index| try writer.print("\"{s}\"", .{vm.heap.readonly_strings.get(string_index)}),
         .string => |string_index| try writer.print("\"{s}\"", .{vm.heap.strings.get(string_index)}),
         else => try vm.writeValue(writer, value),
     }
@@ -51,7 +52,8 @@ fn writeValue(vm: *VM, writer: anytype, value: Value) !void {
         .boolean => |boolean| try writer.print("{}", .{boolean}),
         .number_i32 => |number| try writer.print("{}", .{number}),
         .number_f64 => |number_index| try writer.print("{d}", .{vm.heap.numbers.get(number_index)}),
-        .string => |string_index| try writer.print("{s}", .{vm.heap.strings.get(string_index)}),
+        .readonly_string => |string_index| try writer.writeAll(vm.heap.readonly_strings.get(string_index)),
+        .string => |string_index| try writer.writeAll(vm.heap.strings.get(string_index)),
         .object => |object_index| {
             const object: Heap.ObjectHeap.Item = vm.heap.objects.get(object_index);
 
@@ -484,12 +486,9 @@ fn executeInstruction(vm: *VM, exe: *Executable, fallible_stack: *std.ArrayList(
             try vm.heap.stack.append(vm.heap.arena, .null);
         },
         .push_string => {
-            // TODO: We should probably have a Value variant for readonly
-            // string data instead of always cloning.
             const readonly_string_data = exe.strings.items[insn.args[0]];
-            var string_data = try vm.heap.sparse.dupe(u8, readonly_string_data);
-            const string_index = try vm.heap.strings.create(&vm.heap, string_data);
-            try vm.heap.stack.append(vm.heap.arena, .{ .string = string_index });
+            const readonly_string_index = try vm.heap.readonly_strings.create(&vm.heap, readonly_string_data);
+            try vm.heap.stack.append(vm.heap.arena, .{ .readonly_string = readonly_string_index });
         },
         .push_constant => {
             try vm.heap.stack.append(vm.heap.arena, exe.constants.items[insn.args[0]]);

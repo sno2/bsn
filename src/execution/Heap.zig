@@ -20,6 +20,7 @@ pub const ExecutableHeap = HeapComponent(Executable, struct {
     }
 }.free);
 pub const NumberHeap = HeapComponent(f64, null);
+pub const ReadonlyStringHeap = HeapComponent([]const u8, null);
 pub const StringHeap = HeapComponent([]u8, struct {
     fn free(heap: *Heap, index: usize) void {
         heap.sparse.free(heap.strings.items.items(.value)[index]);
@@ -47,6 +48,7 @@ environment_stack: std.ArrayListUnmanaged(Environment) = .{},
 // Homogenous heaps
 builtin_functions: BuiltinFunctionHeap = .{},
 executables: ExecutableHeap = .{},
+readonly_strings: ReadonlyStringHeap = .{},
 strings: StringHeap = .{},
 numbers: NumberHeap = .{},
 objects: ObjectHeap = .{},
@@ -113,6 +115,9 @@ fn mark(heap: *Heap, value: *const Value) void {
         .builtin_function => |builtin_function_index| {
             heap.builtin_functions.items.items(.flags)[builtin_function_index].?.marked = true;
         },
+        .readonly_string => |readonly_string_index| {
+            heap.readonly_strings.items.items(.flags)[readonly_string_index].?.marked = true;
+        },
         .string => |string_index| {
             heap.strings.items.items(.flags)[string_index].?.marked = true;
         },
@@ -144,8 +149,9 @@ fn sweep(heap: *Heap) void {
         heap.builtin_functions,
         heap.executables,
         heap.numbers,
-        heap.objects,
+        heap.readonly_strings,
         heap.strings,
+        heap.objects,
     }) |component| {
         for (component.items.items(.flags), 0..) |*maybe_flags, index| {
             if (maybe_flags.*) |*flags| {
@@ -184,6 +190,7 @@ pub fn deinit(heap: *Heap) void {
 
     heap.builtin_functions.items.deinit(heap.arena);
     heap.executables.items.deinit(heap.arena);
+    heap.readonly_strings.items.deinit(heap.arena);
     heap.strings.items.deinit(heap.arena);
     heap.numbers.items.deinit(heap.arena);
     heap.objects.items.deinit(heap.arena);

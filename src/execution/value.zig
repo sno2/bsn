@@ -7,6 +7,7 @@ const BuiltinFunctionHeap = Heap.BuiltinFunctionHeap;
 const ExecutableHeap = Heap.ExecutableHeap;
 const NumberHeap = Heap.NumberHeap;
 const ObjectHeap = Heap.ObjectHeap;
+const ReadonlyStringHeap = Heap.ReadonlyStringHeap;
 const StringHeap = Heap.StringHeap;
 
 /// A Bussin value.
@@ -16,6 +17,7 @@ pub const Value = union(enum) {
     number_i32: i32,
     number_f64: NumberHeap.Index,
     string: StringHeap.Index,
+    readonly_string: ReadonlyStringHeap.Index,
     object: ObjectHeap.Index,
     builtin_function: BuiltinFunctionHeap.Index,
     executable: ExecutableHeap.Index,
@@ -152,18 +154,20 @@ pub const Value = union(enum) {
                 .number_f64 => |right_index| left_index == right_index or heap.numbers.get(left_index) == heap.numbers.get(right_index),
                 else => false,
             },
-            .string => |left_index| switch (right) {
-                .string => |right_index| {
-                    if (left_index == right_index) {
-                        return true;
-                    }
+            .readonly_string, .string => {
+                const left_bytes = switch (left) {
+                    .readonly_string => heap.readonly_strings.get(left.readonly_string),
+                    .string => heap.strings.get(left.string),
+                    else => unreachable,
+                };
 
-                    const left_slice = heap.strings.get(left_index);
-                    const right_slice = heap.strings.get(right_index);
+                const right_bytes = switch (right) {
+                    .readonly_string => heap.readonly_strings.get(right.readonly_string),
+                    .string => heap.strings.get(right.string),
+                    else => return false,
+                };
 
-                    return std.mem.eql(u8, left_slice, right_slice);
-                },
-                else => false,
+                return std.mem.eql(u8, left_bytes, right_bytes);
             },
             .object => |left_index| switch (right) {
                 .object => |right_index| left_index == right_index,
