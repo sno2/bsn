@@ -19,23 +19,23 @@ to play around with this interpreter.
   I will use it to add streaming IO.
 - Printing circular objects causes stack overflows.
   ```
-  lit a = {}
-  a.a = a
+  lit a be {} rn
+  a.a be a
 
   "Stack overflow"
-  println(a)
+  waffle(a)
   ```
 - Parsing errors can have incorrect formatting in some cases.
 - Functions do not support capturing locals, but globals do work.
   ```
   bruh foo() {
-      lit a = 24
+      lit a be 24
 
-      bruh add() {
+      bruh bar() {
           a
       }
 
-      add
+      bar
   }
 
   "This will fail because it does not know about 'a'"
