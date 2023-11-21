@@ -44,7 +44,6 @@ function createLanguageData(syntax) {
             "lit",
             "mf",
             "sus",
-            "fake",
             "impostor",
             "nah",
             "fr",
