@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>bsn | A Bussin implementation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="h-screen flex flex-col">
+    <header class="grid grid-cols-3 items-center px-6 border-b border-zinc-700">
+      <img src="/logo.jpg" width="80" />
+      <h1
+        class="text-slate-400 italic mx-auto text [&>a]:transition [&>a:hover]:text-white [&>a:hover]:text-slate-200"
+      >
+        A
+        <a
+          href="https://github.com/face-hh/Bussin"
+          target="_blank"
+          class="underline"
+          >Bussin</a
+        >
+        implementation written in
+        <a href="https://ziglang.org" target="_blank" class="underline">Zig</a>
+      </h1>
+      <div class="ml-auto">
+        <button
+          class="px-4 py-2 rounded-lg border mr-4 border-slate-600 text-slate-300 hover:border-slate-200 transition"
+        >
+          View Examples 📃
+        </button>
+        <button
+          class="px-4 py-2 rounded-lg bg-[#ff5659] hover:brightness-75 transition"
+          id="run-btn"
+        >
+          Run Code 🔨
+        </button>
+      </div>
+    </header>
+    <main class="w-full h-full">
+      <div class="grid grid-cols-2 w-full h-[100%]">
+        <div id="container"></div>
+        <div
+          id="terminal"
+          class="overflow-y-auto font-mono h-full bg-black px-4 py-4"
+        ></div>
+      </div>
+    </main>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

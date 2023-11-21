@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #120e25;
+  color: #fff;
+  font-family: "Space Grotesk", sans-serif;
+}
+
+textarea {
+  background-color: #222;
+}
