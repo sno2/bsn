@@ -311,7 +311,6 @@ pub const ForStatement = struct {
         try exe.emit(.push_environment);
         try @"for".init.generateBytecode(exe);
 
-        // TODO: Is there a better way without two environments?
         try exe.emit(.push_environment);
 
         const body_index: u32 = @intCast(exe.bytecode.items.len);
@@ -341,9 +340,6 @@ pub const TryCatchStatement = struct {
     @"catch": []Statement,
 
     pub fn generateBytecode(try_catch: TryCatchStatement, exe: *Executable) !void {
-        // TODO: Do proper environment stack manipulation and store the
-        // environment index so that we can properly recover from exceptions.
-
         const exception_index = try exe.emitWithMutableIndex(.push_fallible);
 
         for (try_catch.@"try") |stmt| {

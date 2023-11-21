@@ -1,8 +1,5 @@
 //! A lexer for the Bussin language.
 
-// TODO: Fix false-positive lexing for Bussin X operators that are already
-// keywords.
-
 const std = @import("std");
 
 const Config = @import("Config.zig");
@@ -169,7 +166,7 @@ pub fn next(lex: *Lexer) void {
                 lex.index += 1;
                 lex.token = .@":";
 
-                // TODO: Quite ugly and has ambiguity, but it works.
+                // It's ugly, but required for compatibility.
                 if (std.mem.startsWith(u8, lex.source[lex.index..], " string")) {
                     lex.index += " string".len;
                     lex.start = lex.index;
@@ -286,7 +283,7 @@ pub fn next(lex: *Lexer) void {
                 const name = lex.source[lex.start..lex.index];
                 lex.token = switch (lex.config.syntax) {
                     .bs => bs_keywords.get(name),
-                    .bsx => bsx_keywords.get(name),
+                    .bsx => bsx_keywords.get(name) orelse bs_keywords.get(name),
                 } orelse .{ .identifier = name };
             },
             '"' => {

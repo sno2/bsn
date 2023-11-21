@@ -627,7 +627,6 @@ fn executeInstruction(vm: *VM, exe: *Executable, fallible_stack: *std.ArrayList(
                     for (parameters, arguments) |parameter, argument| {
                         function_environment.putAssumeCapacity(parameter, .{
                             .value = argument,
-                            // TODO: Should parameters be mutable?
                             .is_mutable = true,
                         });
                     }
