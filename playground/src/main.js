@@ -1,133 +1,19 @@
 import "./index.css";
 import { init, WASI } from "@wasmer/wasi";
 import * as monaco from "monaco-editor";
-import krTheme from "monaco-themes/themes/Sunburst.json";
+import Sunburst from "monaco-themes/themes/Sunburst.json";
 import { Terminal } from "xterm";
 import "xterm/css/xterm.css";
+import "./language.js";
 
-monaco.editor.defineTheme("krTheme", krTheme);
-
-monaco.languages.register({
-  id: "bs",
-});
-
-monaco.languages.register({
-  id: "bsx",
-});
-
-/** @type {monaco.languages.LanguageConfiguration} */
-const bsConfiguration = {
-  wordPattern: /[A-Za-z_][A-Za-z_0-9]*/,
-  comments: {},
-  brackets: [
-    ["{", "}"],
-    ["(", ")"],
-  ],
-  autoClosingPairs: [
-    { open: "{", close: "}", notIn: ["string"] },
-    { open: "(", close: ")", notIn: ["string"] },
-    { open: '"', close: '"', notIn: ["string"] },
-  ],
-  surroundingPairs: [
-    { open: "{", close: "}" },
-    { open: "(", close: ")" },
-    { open: '"', close: '"' },
-  ],
-};
-
-/** @type {monaco.languages.IMonarchLanguage} */
-const bsLanguage = {
-  defaultToken: "",
-  tokenPostfix: ".bs",
-  keywords: ["if", "else", "for", "fn", "let", "const", "try", "catch"],
-  types: ["number", "object", "string"],
-  constants: ["true", "false", "null"],
-  ident: /[A-Za-z_][A-Za-z_0-9]*/,
-  brackets: [
-    { open: "{", close: "}", token: "delimiter.bracket" },
-    { open: "(", close: ")", token: "delimiter.parenthesis" },
-  ],
-  operators: [
-    "+",
-    "-",
-    "*",
-    "/",
-    "%",
-    "=",
-    "==",
-    "!=",
-    "<",
-    ">",
-    "<=",
-    ">=",
-    "&&",
-    "|",
-    ";",
-    ".",
-  ],
-  symbols: /[\+\-\*\/\%\=\!\<\>\&\|\;\.]+/,
-  tokenizer: {
-    root: [
-      // Operators
-      [
-        /@symbols/,
-        {
-          cases: {
-            "@operators": "delimiter",
-            "@default": "",
-          },
-        },
-      ],
-
-      // Strings
-      ['"', "string", "@string"],
-
-      // Call Identifiers
-      [
-        /@ident(?=\s*\()/,
-        {
-          cases: {
-            "@keywords": "keyword",
-            "@default": "variable.function",
-          },
-        },
-      ],
-
-      // Identifiers
-      [
-        /@ident/,
-        {
-          cases: {
-            "@types": "type",
-            "@keywords": "keyword",
-            "@constants": "variable",
-            "@default": "identifier",
-          },
-        },
-      ],
-
-      // Numbers
-      [/-?[0-9]+.[0-9]*/, "number"],
-      [/-?[0-9]*.[0-9]+/, "number"],
-      [/-?[0-9]+/, "number"],
-    ],
-
-    string: [
-      [/[^"]+/, "string"],
-      [/"/, "string", "@pop"],
-    ],
-  },
-};
-
-monaco.languages.setLanguageConfiguration("bs", bsConfiguration);
-monaco.languages.setMonarchTokensProvider("bs", bsLanguage);
+monaco.editor.defineTheme("Sunburst", Sunburst);
 
 const editor = monaco.editor.create(document.getElementById("container"), {
   value: "for (let i = 0; i < 10; i = i + 1) {\n  println(i)\n}\n",
-  language: "bs",
+  language: "bsx",
   fontFamily: "consolas",
   fontSize: 17,
-  theme: "krTheme",
+  theme: "Sunburst",
 });
 
 const term = new Terminal({
@@ -172,7 +58,7 @@ $runBtn.addEventListener("click", async () => {
         // 'ENVVAR1': '1',
         // 'ENVVAR2': '2'
       },
-      args: ["--inline-bs", code],
+      args: ["--inline-bsx", code],
     });
 
     wasi.instantiate(await module, {
