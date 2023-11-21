@@ -93,12 +93,14 @@ async function runTranslation(targetBs) {
   if (targetBs) {
     $bsBtn.classList.add("hidden");
     $bsxBtn.classList.remove("hidden");
-    document.body.classList.remove("dark");
     editor.updateOptions({ language: "bs", theme: "Dawn" });
+    term.options.theme = { background: "#111" };
+    document.body.classList.remove("dark");
   } else {
     $bsBtn.classList.remove("hidden");
     $bsxBtn.classList.add("hidden");
     editor.updateOptions({ language: "bsx", theme: "Sunburst" });
+    term.options.theme = { background: "#000" };
     document.body.classList.add("dark");
   }
 }
