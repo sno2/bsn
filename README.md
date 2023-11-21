@@ -5,8 +5,8 @@ An implementation of @face-hh 's
 
 ## Playground
 
-The playground is available at https://bsn.vercel.app. It is the easiest way to
-play around with this interpreter.
+The playground is available at https://trybsn.vercel.app. It is the easiest way
+to play around with this interpreter.
 
 ## Known Issues
 
