@@ -44,10 +44,16 @@ pub const Expression = union(enum) {
 
     const BSIdentifierLookup = std.ComptimeStringMap([]const u8, .{
         .{ "waffle", "println" },
+        .{ "clapback", "exec" },
+        .{ "yap", "input" },
+        .{ "nerd", "math" },
     });
 
     const BSXIdentifierLookup = std.ComptimeStringMap([]const u8, .{
         .{ "println", "waffle" },
+        .{ "exec", "clapback" },
+        .{ "input", "yap" },
+        .{ "math", "nerd" },
     });
 
     pub fn emit(expression: Expression, ctx: EmitContext, writer: anytype) @TypeOf(writer).Error!void {
