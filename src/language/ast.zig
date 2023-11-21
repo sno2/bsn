@@ -459,13 +459,13 @@ pub const IfStatement = struct {
         }
 
         try ctx.writeIndent(writer);
-        try writer.writeAll("}\n");
+        try writer.writeAll("}");
 
         for (@"if".alternates) |alternate| {
             if (alternate.condition) |condition| {
                 try writer.print("{s} (", .{switch (ctx.config.syntax) {
-                    .bs => "else if",
-                    .bsx => "impostor sus",
+                    .bs => " else if",
+                    .bsx => " impostor sus",
                 }});
 
                 try condition.emit(ctx, writer);
@@ -473,8 +473,8 @@ pub const IfStatement = struct {
                 try writer.writeAll(") {\n");
             } else {
                 try writer.writeAll(switch (ctx.config.syntax) {
-                    .bs => "else {\n",
-                    .bsx => "impostor {\n",
+                    .bs => " else {\n",
+                    .bsx => " impostor {\n",
                 });
             }
 
