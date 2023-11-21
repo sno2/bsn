@@ -18,6 +18,7 @@ const editor = monaco.editor.create(document.getElementById("container"), {
   fontSize: 17,
   theme: "Sunburst",
   tabSize: 4,
+  wordWrap: "on",
 });
 
 const term = new Terminal({
