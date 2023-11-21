@@ -125,7 +125,7 @@ monaco.languages.setMonarchTokensProvider("bs", bsLanguage);
 const editor = monaco.editor.create(document.getElementById("container"), {
   value: "for (let i = 0; i < 10; i = i + 1) {\n  println(i)\n}\n",
   language: "bs",
-  fontFamily: "Cascadia Code",
+  fontFamily: "consolas",
   fontSize: 17,
   theme: "krTheme",
 });
