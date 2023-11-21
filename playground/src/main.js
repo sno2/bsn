@@ -154,7 +154,7 @@ const moduleBytes = fetch("/bussin.wasm");
 // TODO: We probably should await this.
 init();
 
-const module = await WebAssembly.compileStreaming(moduleBytes);
+const module = WebAssembly.compileStreaming(moduleBytes);
 
 const $output = document.getElementById("output");
 const $runBtn = document.getElementById("run-btn");
@@ -175,14 +175,14 @@ $runBtn.addEventListener("click", async () => {
       args: ["--inline-bs", code],
     });
 
-    await wasi.instantiate(module, {
+    wasi.instantiate(await module, {
       env: {},
     });
 
     const start = performance.now();
 
     // Run the start function
-    await wasi.start();
+    wasi.start();
 
     term.write(wasi.getStdoutString().replaceAll("\n", "\n\r"));
     term.writeln(wasi.getStderrString().replaceAll("\n", "\n\r"));
