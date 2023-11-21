@@ -1,7 +1,8 @@
 <img src="./playground/public/logo.jpg" width="150" alt="bsn">
 
 An implementation of @face-hh 's
-[Bussin esoteric language](https://github.com/face-hh/bussin) written in Zig.
+[Bussin esoteric language](https://github.com/face-hh/bussin) written in Zig
+with a custom component-based mark and sweep garbage collector.
 
 ## Playground
 
