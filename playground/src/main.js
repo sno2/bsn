@@ -9,7 +9,7 @@ import "./language.js";
 monaco.editor.defineTheme("Sunburst", Sunburst);
 
 const editor = monaco.editor.create(document.getElementById("container"), {
-  value: "for (let i = 0; i < 10; i = i + 1) {\n  println(i)\n}\n",
+  value: "yall (lit i be 0; i smol 10; i be i + 1) {\n  waffle(i)\n}\n",
   language: "bsx",
   fontFamily: "consolas",
   fontSize: 17,
