@@ -8,11 +8,12 @@
 }
 
 body {
-  background-color: #120e25;
-  color: #fff;
   font-family: "Space Grotesk", sans-serif;
+  background-color: #fffdd0;
+  color: #120e25;
 }
 
-textarea {
-  background-color: #222;
+body.dark {
+  background-color: #120e25;
+  color: #fff;
 }

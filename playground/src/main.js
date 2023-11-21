@@ -2,11 +2,13 @@ import "./index.css";
 import { init, WASI } from "@wasmer/wasi";
 import * as monaco from "monaco-editor";
 import Sunburst from "monaco-themes/themes/Sunburst.json";
+import Dawn from "monaco-themes/themes/Dawn.json";
 import { Terminal } from "xterm";
 import "xterm/css/xterm.css";
 import "./language.js";
 
 monaco.editor.defineTheme("Sunburst", Sunburst);
+monaco.editor.defineTheme("Dawn", Dawn);
 
 const editor = monaco.editor.create(document.getElementById("container"), {
   value:
@@ -91,11 +93,13 @@ async function runTranslation(targetBs) {
   if (targetBs) {
     $bsBtn.classList.add("hidden");
     $bsxBtn.classList.remove("hidden");
-    editor.updateOptions({ language: "bs" });
+    document.body.classList.remove("dark");
+    editor.updateOptions({ language: "bs", theme: "Dawn" });
   } else {
     $bsBtn.classList.remove("hidden");
     $bsxBtn.classList.add("hidden");
-    editor.updateOptions({ language: "bsx" });
+    editor.updateOptions({ language: "bsx", theme: "Sunburst" });
+    document.body.classList.add("dark");
   }
 }
 

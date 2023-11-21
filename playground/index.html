@@ -12,11 +12,13 @@
       rel="stylesheet"
     />
   </head>
-  <body class="h-screen flex flex-col">
+  <body class="h-screen flex flex-col dark">
     <header class="grid grid-cols-3 items-center px-4 border-b border-zinc-700">
-      <img src="/logo.jpg" width="80" />
+      <a href="/">
+        <img src="/logo.png" width="80" class="invert dark:invert-0" />
+      </a>
       <h1
-        class="text-slate-400 italic mx-auto text [&>a]:transition [&>a:hover]:text-white [&>a:hover]:text-slate-200"
+        class="text-slate-600 dark:text-slate-400 italic mx-auto text [&>a]:transition [&>a:hover]:text-black dark:[&>a:hover]:text-slate-200"
       >
         A
         <a
@@ -30,12 +32,12 @@
       </h1>
       <div class="ml-auto">
         <button
-          class="px-4 py-2 rounded-lg border mr-4 border-slate-600 text-slate-300 hover:border-slate-200 transition"
+          class="px-4 py-2 rounded-lg border mr-4 border-slate-500 text-slate-800 hover:border-slate-900 dark:border-slate-600 dark:text-slate-300 dark:hover:border-slate-200 transition"
         >
           View Examples 📃
         </button>
         <button
-          class="px-4 py-2 rounded-lg bg-[#ff5659] hover:brightness-75 transition"
+          class="px-4 py-2 rounded-lg text-white dark:text-inherit bg-[#ff5659] dark:hover:brightness-75 transition"
           id="run-btn"
         >
           Run Code 🔨
@@ -51,13 +53,13 @@
           class="col-span-1 flex flex-col items-center border-r border-slate-600 bold"
         >
           <button
-            class="px-3 py-4 w-full bg-[rgba(255,255,255,.05)] hover:bg-teal-600 transition"
+            class="px-3 py-4 w-full border-b border-b-slate-600 hover:bg-[rgba(240,240,240,.2)] transition"
             id="bs-btn"
           >
             BSX
           </button>
           <button
-            class="px-3 py-4 w-full bg-[rgba(255,255,255,.05)] hover:bg-teal-600 transition hidden"
+            class="px-3 py-4 w-full border-b border-b-slate-600 hover:bg-[rgba(0,0,0,.2)] transition hidden"
             id="bsx-btn"
           >
             BS
