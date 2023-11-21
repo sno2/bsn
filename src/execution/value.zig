@@ -43,6 +43,14 @@ pub const Value = union(enum) {
         };
     }
 
+    pub inline fn getStringBytes(value: Value, heap: *Heap) ?[]const u8 {
+        return switch (value) {
+            .readonly_string => heap.readonly_strings.get(value.readonly_string),
+            .string => heap.strings.get(value.string),
+            else => null,
+        };
+    }
+
     pub fn @"+"(vm: *VM, left: Value, right: Value) !Value {
         // OPTIMIZATION: Use integer addition if they are both integers.
         if (left == .number_i32 and right == .number_i32) {

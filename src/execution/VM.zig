@@ -115,10 +115,8 @@ fn strcon(vm: *VM, arguments: Arguments) Error!Value {
 
 /// Runs a command and returns the output.
 fn exec(vm: *VM, arguments: Arguments) Error!Value {
-    const message = switch (arguments.get(0)) {
-        .string => |message| vm.heap.strings.get(message),
-        else => try vm.throwException("Expected a string argument, found %.", .{arguments.get(0)}),
-    };
+    const message = arguments.get(0).getStringBytes(&vm.heap) orelse
+        try vm.throwException("Expected a string argument, found %.", .{arguments.get(0)});
 
     if (!std.process.can_spawn) {
         try vm.throwException("Spawning platforms is unsupported on this platform.", &.{});
@@ -160,10 +158,8 @@ fn input(vm: *VM, arguments: Arguments) Error!Value {
 }
 
 fn format(vm: *VM, arguments: Arguments) Error!Value {
-    const format_string = switch (arguments.get(0)) {
-        .string => |message| vm.heap.strings.get(message),
-        else => try vm.throwException("Expected a string argument, found %.", .{arguments.get(0)}),
-    };
+    const format_string = arguments.get(0).getStringBytes(&vm.heap) orelse
+        try vm.throwException("Expected a string argument, found %.", .{arguments.get(0)});
 
     var output = try std.ArrayList(u8).initCapacity(vm.heap.sparse, format_string.len);
 
