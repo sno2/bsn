@@ -13,11 +13,12 @@ monaco.editor.defineTheme("Dawn", Dawn);
 
 const editor = monaco.editor.create(document.getElementById("container"), {
   value:
-    'yall (lit i be 0 rn i smol 10 rn i be i + 1) {\n  waffle("Currently at", i)\n}\n',
+    'yall (lit i be 0 rn i smol 10 rn i be i + 1) {\n    waffle("Currently at", i)\n}\n',
   language: "bsx",
   fontFamily: "consolas",
   fontSize: 17,
   theme: "Sunburst",
+  tabSize: 4,
 });
 
 const term = new Terminal({
