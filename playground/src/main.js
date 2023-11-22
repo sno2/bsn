@@ -154,6 +154,8 @@ function updateLanguage(target) {
     term.options.theme = { background: "#000" };
     document.body.classList.add("dark");
   }
+  term.reset();
+  term.write(ansi.blue("$ "));
 }
 
 $bsBtn.addEventListener("click", () => runTranslation(true));
