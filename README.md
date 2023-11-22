@@ -42,3 +42,7 @@ to play around with this interpreter.
   foo()()
   ```
 - All other TODOs in the code.
+
+## License
+
+[MIT](./LICENSE)
