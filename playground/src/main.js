@@ -8,6 +8,39 @@ import { FitAddon } from "@xterm/addon-fit";
 import "xterm/css/xterm.css";
 import "./language.js";
 import * as ansi from "./ansi.js";
+import examples from "../data/examples.json";
+
+const $examples = document.getElementById("examples");
+const $examplesBtn = document.getElementById("examples-btn");
+
+$examples.addEventListener("click", (e) => {
+  if (e.target === $examples) {
+    $examples.classList.add("hidden");
+  }
+});
+
+let injectedExamples = false;
+$examplesBtn.addEventListener("click", () => {
+  const $content = $examples.querySelector(".content");
+
+  if (!injectedExamples) {
+    for (const example of examples) {
+      const node = document.createElement("button");
+      node.textContent = example.name;
+      node.addEventListener("click", () => {
+        const kind = example.name.endsWith(".bs") ? "bs" : "bsx";
+        $examples.classList.add("hidden");
+        editor.setValue(example.text);
+        updateLanguage(kind);
+      });
+      $content.appendChild(node);
+    }
+
+    injectedExamples = true;
+  }
+
+  $examples.classList.remove("hidden");
+});
 
 monaco.editor.defineTheme("Sunburst", Sunburst);
 monaco.editor.defineTheme("Dawn", Dawn);
@@ -103,7 +136,12 @@ async function runTranslation(targetBs) {
     lib.exports.free(sourcePtr, sourceText.length);
   }
 
-  if (targetBs) {
+  updateLanguage(targetBs ? "bs" : "bsx");
+}
+
+/** @param {"bs" | "bsx"} target */
+function updateLanguage(target) {
+  if (target == "bs") {
     $bsBtn.classList.add("hidden");
     $bsxBtn.classList.remove("hidden");
     editor.updateOptions({ language: "bs", theme: "Dawn" });

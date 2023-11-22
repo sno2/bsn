@@ -9,4 +9,3 @@ try {
     "We can now access the 'error' string"
     println("Uh oh!", error)
 }
-

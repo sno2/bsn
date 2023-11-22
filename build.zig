@@ -85,5 +85,15 @@ pub fn build(b: *std.Build) void {
         .dest_dir = .{ .override = .{ .custom = "../playground/public" } },
     });
 
+    var setup_playground_exe = b.addExecutable(.{
+        .name = "setup_playground",
+        .root_source_file = .{ .path = "src/setup_playground.zig" },
+        .target = target,
+        .optimize = optimize,
+    });
+
+    var setup_playground_cmd = b.addRunArtifact(setup_playground_exe);
+
+    playground_step.dependOn(&setup_playground_cmd.step);
     playground_step.dependOn(&wasm_artifact.step);
 }

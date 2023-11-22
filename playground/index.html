@@ -32,6 +32,7 @@
       <div class="ml-auto">
         <button
           class="px-4 py-2 rounded-lg border mr-4 border-slate-500 text-slate-800 hover:border-slate-900 dark:border-slate-600 dark:text-slate-300 dark:hover:border-slate-200 transition"
+          id="examples-btn"
         >
           View Examples 📃
         </button>
@@ -83,6 +84,23 @@
         ></div>
       </div>
     </main>
+    <div
+      class="fixed hidden w-screen h-screen top-0 left-0 bg-[rgba(0,0,0,.5)] flex items-center justify-center z-50"
+      id="examples"
+    >
+      <div
+        class="flex flex-col py-5 px-6 bg-zinc-200 dark:bg-zinc-800 rounded-lg"
+      >
+        <h1 class="text-4xl font-bold mb-2">Examples 🗒️</h1>
+        <h2 class="mb-4 text-zinc-600 dark:text-zinc-300">
+          Click on the file name to load the program.
+        </h2>
+        <div class="mb-4 border-b border-zinc-400 dark:border-zinc-600"></div>
+        <div
+          class="content grid grid-cols-4 gap-4 [&>div]:text-left font-mono [&>button:hover]:underline text-zinc-700 dark:[&>button:hover]:text-white dark:text-zinc-300"
+        ></div>
+      </div>
+    </div>
     <script type="module" src="./src/main.js"></script>
   </body>
 </html>
