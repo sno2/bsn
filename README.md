@@ -2,7 +2,8 @@
 
 An implementation of @face-hh 's
 [Bussin esoteric language](https://github.com/face-hh/bussin) written in Zig
-with a custom component-based mark and sweep garbage collector.
+with a custom bytecode virtual machine and component-based mark and sweep
+garbage collector.
 
 ## Playground
 
