@@ -2,11 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: "Cascadia Code";
-  src: url("/CascadiaCode.ttf");
-}
-
 body {
   font-family: "Space Grotesk", sans-serif;
   background-color: #fffdd0;

@@ -55,6 +55,11 @@ const editor = monaco.editor.create(document.getElementById("container"), {
   wordWrap: "on",
 });
 
+if (location.hash.startsWith("#code/")) {
+  const code = atob(location.hash.slice(6));
+  editor.setValue(code);
+}
+
 const term = new Terminal({
   fontFamily: "consolas",
   fontSize: 17,
@@ -66,6 +71,28 @@ const fitAddon = new FitAddon();
 term.loadAddon(fitAddon);
 
 term.open(document.getElementById("terminal"));
+term.writeln(ansi.blue("$") + " playground info\n");
+term.writeln(`Welcome to the ${ansi.blue("Bussin Playground")}!\n`);
+term.writeln("Here are a few tips to get you started:\n");
+term.writeln(
+  "- To run your code, click the " +
+    ansi.underline("Run Code") +
+    " button or press " +
+    ansi.underline("Shift + Enter") +
+    ".\n"
+);
+term.writeln(
+  "- To see examples, click the " +
+    ansi.underline("View Examples") +
+    " button.\n"
+);
+term.writeln(
+  "- To change the syntax, click the " + ansi.underline("BS/BSX") + " button.\n"
+);
+term.writeln(
+  "- Also, your code is saved in the URL after every run, so you can share it with others!\n"
+);
+term.writeln("Now, get crackin'!\n");
 term.write(ansi.blue("$ "));
 
 fitAddon.fit();
@@ -103,14 +130,11 @@ const markers = [];
 
 editor.onDidChangeModelContent(async (e) => {
   markers.length = 0;
-  console.log("here 1");
 
   const sourceText = editor.getValue();
   const model = editor.getModel();
 
   if (sourceText.length !== 0) {
-    console.log("here 2");
-
     const lib = (await wasmUtils).instance;
     const memory = lib.exports.memory;
 
@@ -121,14 +145,11 @@ editor.onDidChangeModelContent(async (e) => {
       new Uint8Array(memory.buffer, sourcePtr, sourceText.length)
     );
 
-    console.log("here 3", performance.now());
-    console.log(sourceText);
     const dataPtr = lib.exports.validate(
       currentSyntax,
       sourcePtr,
       sourceText.length
     );
-    console.log("here 4", performance.now());
 
     if (dataPtr !== 0) {
       const errorInfo = new Uint32Array(memory.buffer, dataPtr, 4);
@@ -242,6 +263,8 @@ $runBtn.addEventListener("click", async () => {
 
     const code = editor.getValue();
 
+    window.location.hash = "code/" + btoa(code);
+
     let wasi = new WASI({
       env: {
         // 'ENVVAR1': '1',
@@ -272,7 +295,9 @@ $runBtn.addEventListener("click", async () => {
 
   term.write(
     ansi.gray(
-      `[exit status: 0, duration: ${(performance.now() - start).toFixed(2)}ms] `
+      `[exit status: ${status}, duration: ${(performance.now() - start).toFixed(
+        2
+      )}ms] `
     )
   );
 });
