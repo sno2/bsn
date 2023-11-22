@@ -32,23 +32,39 @@ error_context: ?union(enum) {
     expected_variable_declaration: struct { found: Token.Tag },
     invalid_assignment_target,
 
+    pub fn writeTokenTag(token: Token.Tag, writer: anytype) !void {
+        switch (token) {
+            .number_i32 => try writer.writeAll("a number literal"),
+            .number_f64 => try writer.writeAll("a number literal"),
+            .identifier => try writer.writeAll("an identifier"),
+            .eof => try writer.writeAll("the end of the file"),
+            else => try writer.writeAll(@tagName(token)),
+        }
+    }
+
     pub fn write(self: @This(), p: Parser, writer: anytype) !void {
         _ = p;
         switch (self) {
             .expected => |data| {
-                try writer.print("Expected {s}, found {s}", .{ @tagName(data.expected), @tagName(data.found) });
+                try writer.writeAll("Expected ");
+                try writeTokenTag(data.expected, writer);
+                try writer.writeAll(", found ");
+                try writeTokenTag(data.found, writer);
             },
             .expected_statement => |data| {
-                try writer.print("Expected statement, found {s}", .{@tagName(data.found)});
+                try writer.writeAll("Expected statement, found ");
+                try writeTokenTag(data.found, writer);
             },
             .expected_expression => |data| {
-                try writer.print("Expected expression, found {s}", .{@tagName(data.found)});
+                try writer.writeAll("Expected expression, found ");
+                try writeTokenTag(data.found, writer);
             },
             .expected_variable_declaration => |data| {
-                try writer.print("Expected variable declaration, found {s}", .{@tagName(data.found)});
+                try writer.writeAll("Expected variable declaration, found ");
+                try writeTokenTag(data.found, writer);
             },
             .invalid_assignment_target => {
-                try writer.print("Invalid assignment target", .{});
+                try writer.writeAll("Invalid assignment target");
             },
         }
     }

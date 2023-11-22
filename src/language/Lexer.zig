@@ -26,6 +26,7 @@ pub const Token = union(enum) {
     // Other Types
     eof,
     unknown,
+    unclosed_string,
 
     // Literal Types
     number_i32: i32,
@@ -72,6 +73,13 @@ pub const Token = union(enum) {
     @"!",
     @"&&",
     @"|",
+
+    pub fn isError(tag: Tag) bool {
+        return switch (tag) {
+            .eof, .unknown, .unclosed_string => true,
+            else => false,
+        };
+    }
 
     /// The tag for a token.
     pub const Tag = std.meta.Tag(Token);
@@ -291,6 +299,10 @@ pub fn next(lex: *Lexer) void {
                     lex.index += 1;
 
                     switch (lex.currentByte()) {
+                        -1 => {
+                            lex.token = .unclosed_string;
+                            break :main;
+                        },
                         '"' => {
                             lex.index += 1;
                             break;

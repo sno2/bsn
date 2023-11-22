@@ -3,4 +3,7 @@
 /// The syntax variant.
 syntax: Syntax,
 
-pub const Syntax = enum { bs, bsx };
+pub const Syntax = enum(u8) {
+    bs = 0,
+    bsx = 1,
+};
