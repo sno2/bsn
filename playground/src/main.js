@@ -61,7 +61,7 @@ if (location.hash.startsWith("#code/")) {
 }
 
 const term = new Terminal({
-  fontFamily: "consolas",
+  fontFamily: "consolas, monospace",
   fontSize: 17,
   theme: {
     background: "#000",
